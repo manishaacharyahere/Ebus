@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="index.css">
+    <title>Ebus Management</title>
+</head>
+<body>
+    <div class="logo">
+        <img src="Images/logo.png" href="#home" id="lmain">
+    </div>
+    <nav>
+            <a href="#home">Home</a>
+            <a href="#search">Search Bus Location</a>
+            <a href="log.html" class="titr">Login</a>
+            <a href="reg.html" class="titr">Register</a>
+    </nav>
+    <div class="container">
+        <div id="home">
+            <h1>Welcome to Ebus Management System</h1>
+        </div>
+        <div id="search">
+            <h2>Search Bus Location</h2>
+            <form id="searchForm">
+                <input type="text" id="source" placeholder="Source Location" required>
+                <input type="text" id="destination" placeholder="Destination Location" required>
+                <button type="button" onclick="searchBusLocation()">Search</button>
+            </form>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+
+        const firebaseConfig = {
+                apiKey: "your-api-key",
+                authDomain: "your-auth-domain",
+                projectId: "your-project-id",
+                storageBucket: "your-storage-bucket",
+                messagingSenderId: "your-messaging-sender-id",
+                appId: "your-app-id"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const db = getDatabase(app);
+
+        function searchBusLocation() {
+            const sourceLocation = document.getElementById("source").value;
+            const destinationLocation = document.getElementById("destination").value;
+
+            const busesRef = firebase.ref(db, 'buses');
+
+            const query = firebase.orderByChild(busesRef, 'source').equalTo(sourceLocation);
+            firebase.get(query).then((snapshot) => {
+                if (snapshot.exists()) {
+                    const busData = snapshot.val();
+
+                    const matchingBuses = Object.values(busData).filter(bus => bus.destination === destinationLocation);
+
+                    if (matchingBuses.length > 0) {
+                        alert(`Buses from ${sourceLocation} to ${destinationLocation} found!`);
+                        console.log(matchingBuses);
+                    } else {
+                        alert(`No buses found from ${sourceLocation} to ${destinationLocation}`);
+                    }
+                } else {
+                    alert(`No buses found from ${sourceLocation}`);
+                }
+            }).catch((error) => {
+                console.error("Error reading data: ", error);
+            });
+        }
+        document.getElementById("searchForm").addEventListener('submit', function (e) {
+            e.preventDefault();
+            searchBusLocation();
+        });
+    </script>
+</body>
+</html>

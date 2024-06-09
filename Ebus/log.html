@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="reg.css">
+    <title>Ebus Management</title>
+</head>
+<body>
+    <div class="logo">
+        <img src="Images/logo.png" href="#home" id="lmain">
+    </div>
+    <nav>
+            <a href="index.html">Home</a>
+            <a href="index.html">Search Bus Location</a>
+            <a href="#login" class="titr">Login</a>
+            <a href="reg.html" class="titr">Register</a>
+    </nav><div class="container">
+        <div id="home">
+            <h1>Welcome to Ebus Management System</h1>
+        </div>
+        <div id="login">
+            <h2>Login</h2>
+            <form id="loginForm">
+                <input type="text" id="username" placeholder="Username" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <a href="reg.html" class="newuser">Sign Up</a>
+                <button type="submit" id="submit">Login</button>
+            </form>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.6.0/firebase-app.js";
+        import { getDatabase, ref, set, get, child} from "https://www.gstatic.com/firebasejs/10.6.0/firebase-database.js";
+
+        const firebaseConfig = {
+                apiKey: "your-api-key",
+                authDomain: "your-auth-domain",
+                projectId: "your-project-id",
+                storageBucket: "your-storage-bucket",
+                messagingSenderId: "your-messaging-sender-id",
+                appId: "your-app-id"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const db = getDatabase(app);
+
+document.getElementById("loginForm").addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const enteredUsername = document.getElementById("username").value;
+    const enteredPassword = document.getElementById("password").value;
+
+    const usersRef = ref(db, 'users');
+
+    const query = orderByChild(usersRef, 'username');
+    const userQuery = queryEqualTo(query, enteredUsername);
+
+    get(userQuery).then((snapshot) => {
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            const storedPassword = userData.password;
+
+            if (enteredPassword === storedPassword) {
+                alert("Login Successful!");
+                document.getElementsByClassName("titr").style.display = "none";
+                document.getElementById("userIcon").style.display = "inline";
+            } else {
+                alert("Incorrect Password!");
+            }
+        } else {
+            alert("User not found!");
+        }
+    }).catch((error) => {
+        console.error("Error reading data: ", error);
+    });
+});
+    </script>
+</body>
+</html>
